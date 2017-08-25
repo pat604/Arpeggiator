@@ -15,7 +15,7 @@ namespace Arpeggiator
     class AudioProcessor : VstPluginAudioProcessorBase
     {
         private Plugin _plugin;
-        // private MidiProcessor _midiProcessor;
+        private MidiProcessor _midiProcessor;
         private IVstMidiProcessor _hostProcessor;
 
 
@@ -23,7 +23,7 @@ namespace Arpeggiator
             : base(0, 0, 0)
         {
             _plugin = plugin;
-            // _midiProcessor = plugin.GetInstance<MidiProcessor>();
+            _midiProcessor = plugin.GetInstance<MidiProcessor>();
         }
 
         // This method is used to push midi events to the host.
@@ -34,15 +34,14 @@ namespace Arpeggiator
                 _hostProcessor = _plugin.Host.GetInstance<IVstMidiProcessor>();
             }
 
-            /*
+            
             if (_midiProcessor != null && _hostProcessor != null &&
                 _midiProcessor.Events.Count > 0)
             {
                 _hostProcessor.Process(_midiProcessor.Events);
                 _midiProcessor.Events.Clear();
             }
-            */
-
+            
             // perform audio-through
             base.Process(inChannels, outChannels);
         }
