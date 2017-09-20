@@ -9,7 +9,7 @@
     class PluginEditor : IVstPluginEditor
     {
         private Plugin _plugin;
-        private WinFormsControlWrapper<MidiNoteMapperUI> _uiWrapper = new WinFormsControlWrapper<MidiNoteMapperUI>();
+        private WinFormsControlWrapper<ArpeggiatorUI> _uiWrapper = new WinFormsControlWrapper<ArpeggiatorUI>();
 
 
         public PluginEditor(Plugin plugin)
@@ -43,15 +43,19 @@
 
         public VstKnobMode KnobMode { get; set; }
 
+        
         public void Open(IntPtr hWnd)
         {
-            _uiWrapper.SafeInstance.NoteMap = _plugin.NoteMap;
+            
+            // _uiWrapper.SafeInstance.NoteMap = _plugin.NoteMap;
             _uiWrapper.SafeInstance.NoteOnEvents = _plugin.GetInstance<MidiProcessor>().NoteOnEvents;
             _uiWrapper.Open(hWnd);
-        }
+                
+    }
 
         public void ProcessIdle()
         {
+
             _uiWrapper.SafeInstance.ProcessIdle();
         }
 

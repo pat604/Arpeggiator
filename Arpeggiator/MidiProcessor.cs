@@ -35,8 +35,6 @@ namespace Arpeggiator
             NoteOnEvents = new Queue<byte>();
         }
 
-
-
         #region IVstMidiProcessor Members
 
         public int ChannelCount
@@ -80,6 +78,7 @@ namespace Arpeggiator
 
                     Events.Add(mappedEvent);
 
+                    // ha NoteOff message, akkor kiszedjük a qeue-ból
                     // add raw note-on note numbers to the queue
                     if ((midiEvent.Data[0] & 0xF0) == 0x90)
                     {

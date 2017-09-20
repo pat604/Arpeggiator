@@ -33,7 +33,7 @@ namespace Arpeggiator
             return instance;
         }
 
-        /*
+        
         protected override IVstPluginEditor CreateEditor(IVstPluginEditor instance)
         {
             if (instance == null) return new PluginEditor(this);
@@ -48,6 +48,7 @@ namespace Arpeggiator
             return instance;
         }
 
+        /*
         protected override IVstPluginPersistence CreatePersistence(IVstPluginPersistence instance)
         {
             if (instance == null) return new PluginPersistence(this);
