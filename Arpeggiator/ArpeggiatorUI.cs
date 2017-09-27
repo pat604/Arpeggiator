@@ -31,30 +31,25 @@ namespace Arpeggiator
             byte noteNo;
 
             if (NoteOnEvents.Count > 0)
-            {
-               
+            {           
                 lock (((ICollection)NoteOnEvents).SyncRoot)
                 {
                     noteNo = NoteOnEvents.Dequeue();
-                    notesOn.Add(noteNo);
-                    DisplayNotes();
+                    notesOn.Add(noteNo);             
                 }
-
-               
+                DisplayNotes();
             }
 
 
 
             if (NoteOffEvents.Count > 0)
-            {            
+            {
                 lock (((ICollection)NoteOffEvents).SyncRoot)
                 {
                     noteNo = NoteOffEvents.Dequeue();
-                    notesOn.Remove(noteNo);
-                    DisplayNotes();
+                    notesOn.Remove(noteNo);                    
                 }
-
-               
+                DisplayNotes();
             }
         }
 
@@ -64,9 +59,9 @@ namespace Arpeggiator
             foreach (byte note in notesOn)
             {
                 labelNotesOn.Text += note.ToString() + " ";
-            }
-            
+            }   
         }
+
 
     }
 }
