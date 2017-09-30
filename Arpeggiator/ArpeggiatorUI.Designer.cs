@@ -35,9 +35,9 @@ namespace Arpeggiator
             this.labelNotesOn.AutoSize = true;
             this.labelNotesOn.Location = new System.Drawing.Point(45, 37);
             this.labelNotesOn.Name = "labelNotesOn";
-            this.labelNotesOn.Size = new System.Drawing.Size(33, 13);
+            this.labelNotesOn.Size = new System.Drawing.Size(35, 13);
             this.labelNotesOn.TabIndex = 0;
-            this.labelNotesOn.Text = "notes";
+            this.labelNotesOn.Text = "label1";
             // 
             // ArpeggiatorUI
             // 
@@ -50,7 +50,6 @@ namespace Arpeggiator
             this.Name = "ArpeggiatorUI";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "ArpeggiatorUI";
-            this.Load += new System.EventHandler(this.ArpeggiatorUI_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

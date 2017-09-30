@@ -8,7 +8,7 @@ using System.Collections;
 
 using Jacobi.Vst.Core;
 using Jacobi.Vst.Framework;
-using System.Windows;
+
 
 namespace Arpeggiator
 {
@@ -47,7 +47,7 @@ namespace Arpeggiator
             get { return _plugin.ChannelCount; }
         }
 
-        /*
+
         public void Process(VstEventCollection events)
         {
             foreach (VstEvent evnt in events)
@@ -55,7 +55,7 @@ namespace Arpeggiator
                 if (evnt.EventType != VstEventTypes.MidiEvent) continue;
 
                 VstMidiEvent midiEvent = (VstMidiEvent)evnt;
-                // VstMidiEvent mappedEvent = midiEvent;
+                VstMidiEvent mappedEvent = midiEvent;
 
                 // 0x80: 1-es Channelen küldött Note OFF message (a channel igazából mindegy, kinullázva)
                 // 0x90: 1-es Channelen küldött Note ON message 
@@ -68,8 +68,7 @@ namespace Arpeggiator
                 // add raw note-on note numbers to the queue
                 if ((midiEvent.Data[0] & 0xF0) == 0x90)
                 {
-                    // You can treat note-on midi events with a velocity of 0 (zero) as a note-off midi event     
-                    /*       
+                    // You can treat note-on midi events with a velocity of 0 (zero) as a note-off midi event            
                     if (midiEvent.Data[2] == 0)
                     {
                         lock (((ICollection)NoteOffEvents).SyncRoot)
@@ -77,11 +76,9 @@ namespace Arpeggiator
                             NoteOffEvents.Enqueue(midiEvent.Data[1]);
                         }
                     }
-                   
 
                     else
                     {
-                    
                         lock (((ICollection)NoteOnEvents).SyncRoot)
                         {
                             /* itt kéne machinálni a time-mal
@@ -91,24 +88,21 @@ namespace Arpeggiator
 
                             
                             // notelength?
-                            /*
                             mappedEvent = new VstMidiEvent(midiEvent.DeltaFrames,
-                                midiEvent.NoteLength,
+                                10,
                                 midiEvent.NoteOffset,
                                 midiEvent.Data,
                                 midiEvent.Detune,
                                 midiEvent.NoteOffVelocity);
-
-                           
 
 
                             // itt a mappedEventet kéne sorolni, és vhol megnézni, hogy ha egyszerre több noteOnEvent van, akkor a noteLength lejárta után loopolni a következőt
                             NoteOnEvents.Enqueue(midiEvent.Data[1]);
                         }
 
-                        Events.Add(midiEvent);
+                        Events.Add(mappedEvent);
                     }
-                
+                }
 
                 // note off
                 else if ((midiEvent.Data[0] & 0xF0) == 0x80)
@@ -124,49 +118,12 @@ namespace Arpeggiator
 
             }
         }
-    */
-
-        public void Process(VstEventCollection events)
-        {
-            // MessageBox.Show("megkaptam az eventet - kívül.");
-
-            foreach (VstEvent evnt in events)
-            {
-
-                MessageBox.Show("megkaptam az eventet - belül.");
-
-                if (evnt.EventType != VstEventTypes.MidiEvent) continue;
-
-                VstMidiEvent midiEvent = (VstMidiEvent)evnt;
-
-                MessageBox.Show("megkaptam a MIDI eventet. notelength: " + midiEvent.NoteLength);
-
-                if (((midiEvent.Data[0] & 0xF0) == 0x80 || (midiEvent.Data[0] & 0xF0) == 0x90))
-                {
-
-                    Events.Add(midiEvent);
-
-                    if ((midiEvent.Data[0] & 0xF0) == 0x90)
-                    {
-                        lock (((ICollection)NoteOnEvents).SyncRoot)
-                        {
-                            NoteOnEvents.Enqueue(midiEvent.Data[1]);
-                        }
-                    }
-                }
-                else if (MidiThru)
-                {
-                    Events.Add(evnt);
-                }
-            }
-        }
 
 
 
     }
+
+    #endregion
 }
-
-#endregion
-
 
 
