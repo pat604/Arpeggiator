@@ -17,6 +17,7 @@ namespace Arpeggiator
         {
             InitializeComponent();
             notesOn = new List<byte>();
+
         }
 
         public Queue<byte> NoteOnEvents { get; set; }
@@ -28,10 +29,16 @@ namespace Arpeggiator
         // Updates the UI with the NoteOnEvents
         public void ProcessIdle()
         {
-            byte noteNo;
+
+            // ez itt mind logikailag a midiprocessorhoz tartozik
+
+            
 
             if (NoteOnEvents.Count > 0)
-            {           
+            {
+                MessageBox.Show(NoteOnEvents.Count.ToString());
+                byte noteNo;
+
                 lock (((ICollection)NoteOnEvents).SyncRoot)
                 {
                     noteNo = NoteOnEvents.Dequeue();
@@ -41,9 +48,11 @@ namespace Arpeggiator
             }
 
 
-
+            /*
             if (NoteOffEvents.Count > 0)
             {
+                byte noteNo;
+
                 lock (((ICollection)NoteOffEvents).SyncRoot)
                 {
                     noteNo = NoteOffEvents.Dequeue();
@@ -51,6 +60,7 @@ namespace Arpeggiator
                 }
                 DisplayNotes();
             }
+            */
         }
 
         private void DisplayNotes()
@@ -58,10 +68,14 @@ namespace Arpeggiator
             labelNotesOn.Text = "";
             foreach (byte note in notesOn)
             {
+                System.Diagnostics.Debug.WriteLine("note is on: " + note.ToString());
                 labelNotesOn.Text += note.ToString() + " ";
             }   
         }
 
-
+        private void ArpeggiatorUI_Load(object sender, EventArgs e)
+        {
+            // labelNotesOn.Text += " test";
+        }
     }
 }

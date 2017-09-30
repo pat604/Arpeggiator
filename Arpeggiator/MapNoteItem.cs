@@ -11,6 +11,7 @@ namespace Arpeggiator
 {
 
     // Represents one note mapping.
+    // egyelőre nem kell
     class MapNoteItem
     {
 
