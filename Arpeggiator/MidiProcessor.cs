@@ -100,9 +100,10 @@ namespace Arpeggiator
                                 // int noteLength = midiEvent.NoteLength;
 
 
+                                // új VstMidiEvent létrehozása a régi adataival (csak a midiData változik)
                                 // 1-es noteLength
                                 mappedEvent = new VstMidiEvent(midiEvent.DeltaFrames,
-                                    100,
+                                    1,
                                     midiEvent.NoteOffset,
                                     midiEvent.Data,
                                     midiEvent.Detune,
@@ -123,6 +124,8 @@ namespace Arpeggiator
                             NoteOffEvents.Enqueue(midiEvent.Data[1]);
                         }
                     }
+
+
 
                     Events.Add(mappedEvent);
                 }
