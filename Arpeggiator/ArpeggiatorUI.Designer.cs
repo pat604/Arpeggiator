@@ -1,15 +1,16 @@
-﻿using System.Windows.Forms;
-
-namespace Arpeggiator
+﻿namespace Arpeggiator
 {
     partial class ArpeggiatorUI
     {
-
-        // Required designer variable.
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-      
-        // Clean up any resources being used.
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -27,28 +28,26 @@ namespace Arpeggiator
         /// </summary>
         private void InitializeComponent()
         {
-            this.labelNotesOn = new System.Windows.Forms.Label();
+            this.NotesOn = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // labelNotesOn
+            // NotesOn
             // 
-            this.labelNotesOn.AutoSize = true;
-            this.labelNotesOn.Location = new System.Drawing.Point(45, 37);
-            this.labelNotesOn.Name = "labelNotesOn";
-            this.labelNotesOn.Size = new System.Drawing.Size(35, 13);
-            this.labelNotesOn.TabIndex = 0;
-            this.labelNotesOn.Text = "label1";
+            this.NotesOn.AutoSize = true;
+            this.NotesOn.Location = new System.Drawing.Point(45, 37);
+            this.NotesOn.Name = "NotesOn";
+            this.NotesOn.Size = new System.Drawing.Size(38, 13);
+            this.NotesOn.TabIndex = 0;
+            this.NotesOn.Text = "label1";
             // 
             // ArpeggiatorUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(454, 262);
-            this.Controls.Add(this.labelNotesOn);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Controls.Add(this.NotesOn);
+            this.Font = new System.Drawing.Font("Rockwell", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "ArpeggiatorUI";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "ArpeggiatorUI";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -57,6 +56,6 @@ namespace Arpeggiator
 
         #endregion
 
-        private System.Windows.Forms.Label labelNotesOn;
+        private System.Windows.Forms.Label NotesOn;
     }
 }

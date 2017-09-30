@@ -47,9 +47,8 @@
         public void Open(IntPtr hWnd)
         {
             
+            // _uiWrapper.SafeInstance.NoteMap = _plugin.NoteMap;
             _uiWrapper.SafeInstance.NoteOnEvents = _plugin.GetInstance<MidiProcessor>().NoteOnEvents;
-            _uiWrapper.SafeInstance.NoteOffEvents = _plugin.GetInstance<MidiProcessor>().NoteOffEvents;
-   
             _uiWrapper.Open(hWnd);
                 
     }

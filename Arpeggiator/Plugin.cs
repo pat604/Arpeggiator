@@ -14,13 +14,13 @@ namespace Arpeggiator
     class Plugin : VstPluginWithInterfaceManagerBase, IVstPluginMidiSource
     {
 
-        // public MapNoteItemList NoteMap { get; private set; }
+        public MapNoteItemList NoteMap { get; private set; }
 
         public Plugin()
             : base("LiveAggiator", new VstProductInfo("VST.NET Arpeggiator", "Patricia", 1000),
                 VstPluginCategory.Effect, VstPluginCapabilities.NoSoundInStop, 0, 0x30313233)
         {
-            
+            NoteMap = new MapNoteItemList();
         }
 
   
