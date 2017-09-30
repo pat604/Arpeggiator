@@ -16,14 +16,19 @@ namespace Arpeggiator
         public ArpeggiatorUI()
         {
             InitializeComponent();
+            notesOn = new List<byte>();
         }
 
         public Queue<byte> NoteOnEvents { get; set; }
+        public Queue<byte> NoteOffEvents { get; set; }
+        private List<byte> notesOn { get; set;  } 
 
-        
+
+
         // Updates the UI with the NoteOnEvents
         public void ProcessIdle()
         {
+            
             if (NoteOnEvents.Count > 0)
             {
                 byte noteNo;
@@ -31,18 +36,33 @@ namespace Arpeggiator
                 lock (((ICollection)NoteOnEvents).SyncRoot)
                 {
                     noteNo = NoteOnEvents.Dequeue();
-                }
+                    notesOn.Add(noteNo);
+                    DisplayNotes();
+                }               
+            }
 
-                // SelectNoteMapItem(noteNo);
-                DisplayNote();
-                
+
+            if (NoteOffEvents.Count > 0)
+            {
+                byte noteNo;
+
+                lock (((ICollection)NoteOffEvents).SyncRoot)
+                {
+                    noteNo = NoteOffEvents.Dequeue();
+                    notesOn.Remove(noteNo);
+                    DisplayNotes();
+                }         
             }
         }
 
-        private void DisplayNote()
+
+        private void DisplayNotes()
         {
-
-
+            labelNotesOn.Text = "";
+            foreach (byte note in notesOn)
+            {
+                labelNotesOn.Text += note.ToString() + " ";
+            }
         }
 
     }
