@@ -28,35 +28,33 @@ namespace Arpeggiator
         // Updates the UI with the NoteOnEvents
         public void ProcessIdle()
         {
-            byte noteNo;
-
+            
             if (NoteOnEvents.Count > 0)
             {
-               
+                byte noteNo;
+
                 lock (((ICollection)NoteOnEvents).SyncRoot)
                 {
                     noteNo = NoteOnEvents.Dequeue();
                     notesOn.Add(noteNo);
                     DisplayNotes();
-                }
-
-               
+                }               
             }
 
 
-
             if (NoteOffEvents.Count > 0)
-            {            
+            {
+                byte noteNo;
+
                 lock (((ICollection)NoteOffEvents).SyncRoot)
                 {
                     noteNo = NoteOffEvents.Dequeue();
                     notesOn.Remove(noteNo);
                     DisplayNotes();
-                }
-
-               
+                }         
             }
         }
+
 
         private void DisplayNotes()
         {
@@ -65,7 +63,6 @@ namespace Arpeggiator
             {
                 labelNotesOn.Text += note.ToString() + " ";
             }
-            
         }
 
     }

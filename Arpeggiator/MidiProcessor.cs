@@ -57,67 +57,12 @@ namespace Arpeggiator
                 VstMidiEvent midiEvent = (VstMidiEvent)evnt;
                 VstMidiEvent mappedEvent = midiEvent;
 
-                // 0x80: 1-es Channelen küldött Note OFF message (a channel igazából mindegy, kinullázva)
-                // 0x90: 1-es Channelen küldött Note ON message 
-                // & 0xF0: bitenkénti és; a két hexa karakter első tagját kapjuk meg, a másodikat kinullázza
-                // Data[0]: első bájt: két hexadecimális karakter
-                // a midiEvent Note off vagy Note on típusú
-                if (((midiEvent.Data[0] & 0xF0) == 0x80 || (midiEvent.Data[0] & 0xF0) == 0x90))
+
+                //  note on     
+                if ((midiEvent.Data[0] & 0xF0) == 0x90)
                 {
-
-                    //  ha Note On message, akkor csak a kimeneti hangmagasságot (.Data[1]) hozzáadom NoteOnEventshez
-                    // add raw note-on note numbers to the queue
-                    if ((midiEvent.Data[0] & 0xF0) == 0x90)
-                    {
-                        // You can treat note-on midi events with a velocity of 0 (zero) as a note-off midi event.             
-                        if (midiEvent.Data[2] == 0)
-                        {
-                            lock (((ICollection)NoteOffEvents).SyncRoot)
-                            {
-                                NoteOffEvents.Enqueue(midiEvent.Data[1]);
-                            }
-                        }
-
-                        else
-                        {
-                            lock (((ICollection)NoteOnEvents).SyncRoot)
-                            {
-                                /* itt kéne machinálni a time-mal
-                                VstTimeInfo timeInfo = _plugin.Host.GetInstance<VstTimeInfo>();
-                                double tempo = timeInfo.Tempo;
-                                //timeInfo.
-                                */
-                                /*
-                                byte[] midiData = new byte[4];
-                                // midiData[0]: Note On v Note Off marad
-                                midiData[0] = midiEvent.Data[0];
-                                // midiData[1]: a Pitch-et átállítjuk
-                                midiData[1] = _plugin.NoteMap[midiEvent.Data[1]].OutputNoteNumber;
-                                // midiData[2]: Velocity marad
-                                midiData[2] = midiEvent.Data[2];
-                                */
-
-                                // int noteLength = midiEvent.NoteLength;
-
-
-                                // új VstMidiEvent létrehozása a régi adataival (csak a midiData változik)
-                                // 1-es noteLength
-                                mappedEvent = new VstMidiEvent(midiEvent.DeltaFrames,
-                                    1,
-                                    midiEvent.NoteOffset,
-                                    midiEvent.Data,
-                                    midiEvent.Detune,
-                                    midiEvent.NoteOffVelocity);
-                                
-
-                                // itt a mappedEventet kéne sorolni, és vhol megnézni, hogy ha egyszerre több noteOnEvent van, akkor a noteLength lejárta után loopolni a következőt
-                               NoteOnEvents.Enqueue(midiEvent.Data[1]);
-                            }
-                        }
-                    }
-
-                    // note off
-                    else if ((midiEvent.Data[0] & 0xF0) == 0x80)
+                    // You can treat note-on midi events with a velocity of 0 (zero) as a note-off midi event.             
+                    if (midiEvent.Data[2] == 0)
                     {
                         lock (((ICollection)NoteOffEvents).SyncRoot)
                         {
@@ -125,14 +70,50 @@ namespace Arpeggiator
                         }
                     }
 
+                    else
+                    {
+                        lock (((ICollection)NoteOnEvents).SyncRoot)
+                        {
+                            mappedEvent = new VstMidiEvent(
+                                      100,
+                                      1000,
+                                      midiEvent.NoteOffset,
+                                      midiEvent.Data,
+                                      midiEvent.Detune,
+                                      midiEvent.NoteOffVelocity);
 
 
-                    Events.Add(mappedEvent);
+                            NoteOnEvents.Enqueue(midiEvent.Data[1]);
+                        }
+                    }
                 }
+
+                // note off
+                else if ((midiEvent.Data[0] & 0xF0) == 0x80)
+                {
+                    lock (((ICollection)NoteOffEvents).SyncRoot)
+                    {
+                        NoteOffEvents.Enqueue(midiEvent.Data[1]);
+                    }
+                }
+
+                // egyelőre a sima midiEvent
+                Events.Add(mappedEvent);
+                // Arpeggiate(mappedEvent);
             }
         }
 
         #endregion
+
+        private void Arpeggiate(VstMidiEvent midiEvent)
+        {
+
+            // Events.Add(midiEvent);
+        }
+
+
+
+
     }
 }
 
