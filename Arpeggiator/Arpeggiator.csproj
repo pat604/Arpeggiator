@@ -60,7 +60,7 @@
       <DependentUpon>ArpeggiatorUI.cs</DependentUpon>
     </Compile>
     <Compile Include="AudioProcessor.cs" />
-    <Compile Include="MapNoteItem.cs" />
+    <Compile Include="HostCommandStub.cs" />
     <Compile Include="MidiProcessor.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginCommandStub.cs" />

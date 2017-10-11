@@ -14,16 +14,20 @@ namespace Arpeggiator
     class Plugin : VstPluginWithInterfaceManagerBase, IVstPluginMidiSource
     {
 
-        // public MapNoteItemList NoteMap { get; private set; }
-
         public Plugin()
             : base("LiveAggiator", new VstProductInfo("VST.NET Arpeggiator", "Patricia", 1000),
                 VstPluginCategory.Effect, VstPluginCapabilities.NoSoundInStop, 0, 0x30313233)
         {
-            
+
         }
 
-  
+        public IVstHostSequencer getHostSequencer()
+        {
+            IVstHostSequencer hostSequencer = this.Host.GetInstance<IVstHostSequencer>();
+            return hostSequencer;
+        }
+
+        
 
         // Creates a default instance and reuses that for all threads.
         protected override IVstPluginAudioProcessor CreateAudioProcessor(IVstPluginAudioProcessor instance)
@@ -47,15 +51,6 @@ namespace Arpeggiator
 
             return instance;
         }
-
-        /*
-        protected override IVstPluginPersistence CreatePersistence(IVstPluginPersistence instance)
-        {
-            if (instance == null) return new PluginPersistence(this);
-
-            return instance;
-        }
-        */
 
 
         // Always returns 'this'
@@ -90,7 +85,7 @@ namespace Arpeggiator
 
         #endregion
 
-    
+
     }
- }
+}
 
