@@ -122,8 +122,7 @@ namespace Arpeggiator
         private VstMidiEvent actualMidiEvent;
 
         public void Arpeggiate()
-        {
-            MessageBox.Show("Arpeggiate() called");
+        {        
             // NoteOnEvents.Count == 1
 
             VstMidiEvent newMidiEvent;
@@ -135,18 +134,17 @@ namespace Arpeggiator
                 newMidiEvent = new VstMidiEvent(0, NoteOnEvents[0].NoteLength, NoteOnEvents[0].NoteOffset, NoteOnEvents[0].Data, NoteOnEvents[0].Detune, NoteOnEvents[0].NoteOffVelocity);
                 Events.Add(newMidiEvent);
                 processedFrames += 512;
-                MessageBox.Show(processedFrames.ToString());
+                // MessageBox.Show(processedFrames.ToString());
             }
 
-            else if (processedFrames < 44000) // 86x512=44000
+            else if (processedFrames < 44000 && actualMidiEvent != null) // 86x512=44000
             {
                 processedFrames += 512;
-                MessageBox.Show(processedFrames.ToString());
+                // MessageBox.Show(processedFrames.ToString());
 
             }
-
-            /*
-            else
+         
+            else if (actualMidiEvent != null)
             {
                 // note off 
                 byte[] midiData = new byte[4];
@@ -157,8 +155,9 @@ namespace Arpeggiator
                 newMidiEvent = new VstMidiEvent(68, actualMidiEvent.NoteLength, actualMidiEvent.NoteOffset, midiData, actualMidiEvent.Detune, actualMidiEvent.NoteOffVelocity);
                 Events.Add(newMidiEvent);
                 processedFrames = 0;
+                actualMidiEvent = null;
             }
-            */
+            
 
 
 

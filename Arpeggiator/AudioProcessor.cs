@@ -52,14 +52,17 @@ namespace Arpeggiator
                 _hostProcessor = _plugin.Host.GetInstance<IVstMidiProcessor>();
             }
 
-            if (_midiProcessor != null && _hostProcessor != null &&
-                _midiProcessor.Events.Count > 0)
+            if (_midiProcessor != null && _hostProcessor != null)
             {
                 timeInfo = _plugin.Host.GetInstance<IVstHostSequencer>().GetTime(VstTimeInfoFlags.PpqPositionValid | VstTimeInfoFlags.BarStartPositionValid | VstTimeInfoFlags.TempoValid);    
                 _midiProcessor.setTimeInfo(timeInfo);
                 _midiProcessor.Arpeggiate();
-                _hostProcessor.Process(_midiProcessor.Events);
-                _midiProcessor.Events.Clear();
+
+                if (_midiProcessor.Events.Count > 0)
+                {
+                    _hostProcessor.Process(_midiProcessor.Events);
+                    _midiProcessor.Events.Clear();
+                }
             }
 
             // perform audio-through
