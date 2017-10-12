@@ -118,44 +118,54 @@ namespace Arpeggiator
 
         private const int _deltaFrames = 44100;
         private const int _blockSize = 512;
-        private int processedFrames = 0;
-        private VstMidiEvent actualMidiEvent;
+        private int _processedFrames = 0;
+        private VstMidiEvent _actualMidiEvent;
+        private int _counter = 0;   // a NoteOnEvents listen belül hol tart az arp 
 
+        // 44100 sample frame = 1 sec
         public void Arpeggiate()
         {        
             // NoteOnEvents.Count == 1
 
             VstMidiEvent newMidiEvent;
 
-            if (processedFrames == 0 && NoteOnEvents.Count == 1)
+            if (_processedFrames == 0 && NoteOnEvents.Count > 0)
             {
                 // note on
-                actualMidiEvent = NoteOnEvents[0];
-                newMidiEvent = new VstMidiEvent(0, NoteOnEvents[0].NoteLength, NoteOnEvents[0].NoteOffset, NoteOnEvents[0].Data, NoteOnEvents[0].Detune, NoteOnEvents[0].NoteOffVelocity);
+                _actualMidiEvent = NoteOnEvents[_counter];
+                newMidiEvent = new VstMidiEvent(0, NoteOnEvents[_counter].NoteLength, NoteOnEvents[_counter].NoteOffset, NoteOnEvents[_counter].Data, NoteOnEvents[_counter].Detune, NoteOnEvents[_counter].NoteOffVelocity);
                 Events.Add(newMidiEvent);
-                processedFrames += 512;
-                // MessageBox.Show(processedFrames.ToString());
+                _processedFrames += 512;
+                
             }
 
-            else if (processedFrames < 44000 && actualMidiEvent != null) // 86x512=44000
+            else if (_processedFrames < 44000 && _actualMidiEvent != null) // 86x512=44000
             {
-                processedFrames += 512;
-                // MessageBox.Show(processedFrames.ToString());
-
+                _processedFrames += 512;             
             }
          
-            else if (actualMidiEvent != null)
+            else if (_actualMidiEvent != null)
             {
                 // note off 
                 byte[] midiData = new byte[4];
                 midiData[0] = 0x80;
-                midiData[1] = actualMidiEvent.Data[1];
-                midiData[2] = actualMidiEvent.Data[2];
+                midiData[1] = _actualMidiEvent.Data[1];
+                midiData[2] = _actualMidiEvent.Data[2];
                 midiData[3] = 0;
-                newMidiEvent = new VstMidiEvent(68, actualMidiEvent.NoteLength, actualMidiEvent.NoteOffset, midiData, actualMidiEvent.Detune, actualMidiEvent.NoteOffVelocity);
+                newMidiEvent = new VstMidiEvent(68, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, midiData, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
                 Events.Add(newMidiEvent);
-                processedFrames = 0;
-                actualMidiEvent = null;
+
+                _processedFrames = 0;
+                if (NoteOnEvents[_counter + 1] != null)
+                {
+                    _counter++;
+                    _actualMidiEvent = NoteOnEvents[_counter];
+                }
+                else
+                {
+                    _counter = 0;
+                    _actualMidiEvent = null;
+                }
             }
             
 
