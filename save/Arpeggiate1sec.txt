@@ -1,0 +1,53 @@
+  public void Arpeggiate()
+        {
+            countQuarter(); // minden körben változhat a Tempo...
+
+            VstMidiEvent newMidiEvent;
+
+            if (_processedFrames == 0 && _octavesAddedOrderedNoteOnEvents.Count > 0)
+            {
+                // note on
+                _actualMidiEvent = makeCopy(_octavesAddedOrderedNoteOnEvents[_counter]);
+                newMidiEvent = new VstMidiEvent(_remainder, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, _actualMidiEvent.Data, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
+                Events.Add(newMidiEvent);
+                _processedFrames += 512;
+
+            }
+
+            else if (_processedFrames < 43588 && _actualMidiEvent != null) // 43588 + 512 = 44100
+            {
+                _processedFrames += 512;
+            }
+
+            else if (_actualMidiEvent != null) // note off 
+            {
+
+                byte[] midiData = new byte[4];
+                midiData[0] = 0x80;
+                midiData[1] = _actualMidiEvent.Data[1];
+                midiData[2] = _actualMidiEvent.Data[2];
+                midiData[3] = 0;
+                newMidiEvent = new VstMidiEvent(44100 - _processedFrames, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, midiData, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
+                Events.Add(newMidiEvent);
+
+
+                if ((_counter + 1) < _octavesAddedOrderedNoteOnEvents.Count)    // note on a következő hangra az _octavesAddedOrderedNoteOnEvents listából
+                {
+                    _counter++;
+                    _actualMidiEvent = makeCopy(_octavesAddedOrderedNoteOnEvents[_counter]);
+                    // a note off-fal egy időben jöhet a köv. hang note on-ja is
+                    newMidiEvent = new VstMidiEvent(44100 - _processedFrames, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, _actualMidiEvent.Data, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
+                    Events.Add(newMidiEvent);
+                    _remainder = 512 - (44100 - _processedFrames);
+                    _processedFrames = 0;
+                }
+                else // végigért az _octavesAddedOrderedNoteOnEvents listán, kör eleje
+                {
+                    _counter = 0;
+                    _actualMidiEvent = null;
+                    _remainder = 0;
+                    _processedFrames = 0;
+                }
+            }
+
+        }

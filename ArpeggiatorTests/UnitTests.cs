@@ -12,6 +12,8 @@ namespace ArpeggiatorTests
     [TestFixture]
     public class UnitTests
     {
+
+     
         /*
         PluginCommandStub pluginCommandStub;
         ArpeggiatorUI ui;

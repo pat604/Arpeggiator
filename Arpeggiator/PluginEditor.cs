@@ -4,7 +4,7 @@
     using Jacobi.Vst.Core;
     using Jacobi.Vst.Framework;
     using Jacobi.Vst.Framework.Common;
-   
+    using System.Windows;
     // Implements the custom UI editor for the plugin.
     class PluginEditor : IVstPluginEditor
     {
@@ -15,6 +15,9 @@
         public PluginEditor(Plugin plugin)
         {
             _plugin = plugin;
+            _uiWrapper.SafeInstance.DirectionSelected += DirectionSelected;     
+            _uiWrapper.SafeInstance.OctaveSelected += OctaveSelected;
+            _uiWrapper.SafeInstance.RythmSelected += RythmSelected;
         }
 
         #region IVstPluginEditor Members
@@ -46,17 +49,33 @@
         
         public void Open(IntPtr hWnd)
         {
-            
-            _uiWrapper.SafeInstance.NoteOnEvents = _plugin.GetInstance<MidiProcessor>().NoteOnEvents;
-            _uiWrapper.SafeInstance.NoteOffEvents = _plugin.GetInstance<MidiProcessor>().NoteOffEvents;
-   
-            _uiWrapper.Open(hWnd);
-                
+           //  _uiWrapper.SafeInstance.SetPlugin(_plugin); // ???
+
+            _uiWrapper.SafeInstance.NoteOnNumbers = _plugin.GetInstance<MidiProcessor>().NoteOnNumbers;
+            _uiWrapper.SafeInstance.NoteOffNumbers = _plugin.GetInstance<MidiProcessor>().NoteOffNumbers;
+          
+            _uiWrapper.Open(hWnd);              
     }
+
+        private void DirectionSelected(object sender, DirectionEventArgs e)
+        {
+            _plugin.GetInstance<MidiProcessor>().Direction = e.Direction;
+        }
+
+        private void OctaveSelected(object sender, OctaveEventArgs o)
+        {
+            _plugin.GetInstance<MidiProcessor>().Octave = o.Octave;
+            // _plugin.GetInstance<MidiProcessor>().AddOctaves();     
+        }
+
+        private void RythmSelected(object sender, RythmEventArgs r)
+        {
+            _plugin.GetInstance<MidiProcessor>().NoteLengthsArray = r.NoteLengths;
+            _plugin.GetInstance<MidiProcessor>().CountRythm();
+        }
 
         public void ProcessIdle()
         {
-
             _uiWrapper.SafeInstance.ProcessIdle();
         }
 
