@@ -33,19 +33,15 @@ namespace Arpeggiator
             // _midiProcessor.setBlockSize(_plugin.Host.GetInstance<IVstHostSequencer>().BlockSize);
         }
 
+        // MidiProcessor's Process is called before this
         // This method is used to push midi events to the host.
         public override void Process(VstAudioBuffer[] inChannels, VstAudioBuffer[] outChannels)
-        {
-
-            /*
+        {          
             timeInfo = _plugin.Host.GetInstance<IVstHostCommands20>().GetTimeInfo(
             VstTimeInfoFlags.PpqPositionValid | VstTimeInfoFlags.BarStartPositionValid | VstTimeInfoFlags.TempoValid);
-            MessageBox.Show("tempo:" + timeInfo.Tempo.ToString() + "\n sample rate" + timeInfo.SampleRate.ToString()
-                + "\n sign. numerator: " + timeInfo.TimeSignatureNumerator.ToString());
-            */
 
-            // 512
-            // MessageBox.Show("BlockSize: " + _plugin.Host.GetInstance<IVstHostSequencer>().BlockSize);
+            // MessageBox.Show("tempo:" + timeInfo.Tempo.ToString() + "\n sample rate" + timeInfo.SampleRate.ToString()
+            //     + "\n sign. numerator: " + timeInfo.TimeSignatureNumerator.ToString());            
 
             if (_hostProcessor == null)
             {
@@ -54,9 +50,10 @@ namespace Arpeggiator
 
             if (_midiProcessor != null && _hostProcessor != null)
             {
-                timeInfo = _plugin.Host.GetInstance<IVstHostSequencer>().GetTime(VstTimeInfoFlags.PpqPositionValid | VstTimeInfoFlags.BarStartPositionValid | VstTimeInfoFlags.TempoValid);    
+
                 _midiProcessor.setTimeInfo(timeInfo);
                 _midiProcessor.Arpeggiate();
+                // _midiProcessor.TestMakeCopy();
 
                 if (_midiProcessor.Events.Count > 0)
                 {

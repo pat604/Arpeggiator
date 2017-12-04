@@ -1,0 +1,61 @@
+   /*
+        private void OrderNoteOnEvents()
+        {
+            switch (Direction)
+            {
+                case Directions.up:
+                    _orderedNoteOnEvents = _noteOnEvents.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
+                    break;
+
+                case Directions.down:
+                    _orderedNoteOnEvents = _noteOnEvents.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
+                    break;
+
+                case Directions.cyclic_up_down:
+                        _orderedNoteOnEvents = _noteOnEvents.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
+                        List<VstMidiEvent> descendingList = _noteOnEvents.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
+                        if (descendingList.Count != 0)
+                            descendingList.RemoveAt(0);                         // first item
+                        if (descendingList.Count != 0)
+                            descendingList.RemoveAt(descendingList.Count - 1);  // last item
+                        _orderedNoteOnEvents.AddRange(descendingList);                  
+                    break;
+
+
+                case Directions.cyclic_down_up:
+                    _orderedNoteOnEvents = _noteOnEvents.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
+                    List<VstMidiEvent> ascendingList = _noteOnEvents.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
+                    if (ascendingList.Count != 0)
+                        ascendingList.RemoveAt(0);                         // first item
+                    if (ascendingList.Count != 0)
+                        ascendingList.RemoveAt(ascendingList.Count - 1);  // last item
+                    _orderedNoteOnEvents.AddRange(ascendingList);
+                    break;
+
+                    /* TODO
+                case Directions.terraced:
+                    orderedList = NoteOnEvents.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
+                    break;
+                    
+
+                case Directions.random:
+                    Random rand = new Random();
+                    _orderedNoteOnEvents = _noteOnEvents;
+                    int n = _orderedNoteOnEvents.Count;
+                    while (n > 1)
+                    {
+                        n--;
+                        int k = rand.Next(n + 1);
+                        VstMidiEvent e = _orderedNoteOnEvents[k];
+                        _orderedNoteOnEvents[k] = _noteOnEvents[n];
+                        _orderedNoteOnEvents[n] = e;
+                    }
+                    break;
+
+                default:
+                    break;
+
+
+            }
+        }
+        */
