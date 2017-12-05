@@ -17,24 +17,28 @@ using Jacobi.Vst.Framework.Common;
 namespace Arpeggiator
 {
 
-    public enum Directions { up, down, cyclic_up_down, cyclic_down_up, terraced, random }
+    public enum Directions { up, down, updown, downup, random }
 
     public enum NoteLengths { quarter = 1, eighth_eighth = 2, rest = 3, eighth_rest = 4, rest_eighth = 5, triplet = 6 };
 
 
-    public struct NoteLengthSamples
+    public struct NoteLengthFrames
     {
-        public bool note;          // true: note, false: rest
-        public double frames;     // for how many samples
+        public bool note;           // true: note, false: rest
+        public double frames;       // for how many samples
+        public bool accent;        // accent: 120, no-accent: 100
 
-        public NoteLengthSamples(bool note, double frames)
+        public NoteLengthFrames(bool note, double frames, bool accent)
         {
             this.note = note;
             this.frames = frames;
+            this.accent = accent;
         }
     }
 
-    public enum Accents { none = 1, downbeat, upbeat } 
+    // default velocity: 100
+    // 1-127 (pppp-ffff)
+    public enum Accents { none, downbeat, upbeat }
 
 
     // Implements the incoming Midi event handling for the plugin.
@@ -48,10 +52,8 @@ namespace Arpeggiator
         // Gets or sets a value indicating wether non-mapped midi events should be passed to the output.    
         public bool MidiThru { get; set; }
 
-        // The raw note on note numbers
         public Queue<byte> NoteOnNumbers { get; private set; }
 
-        // eredetileg milyen hangokat adott be a user éppen
         private List<VstMidiEvent> _noteOnEvents { get; set; }
 
         private List<VstMidiEvent> _octavesAddedOrderedNoteOnEvents { get; set; }
@@ -67,6 +69,7 @@ namespace Arpeggiator
 
         public NoteLengths[] NoteLengthsArray { get; set; }
 
+        public Accents[] AccentsArray { get; set; }
 
 
         public MidiProcessor(Plugin plugin)
@@ -77,21 +80,19 @@ namespace Arpeggiator
             NoteOffNumbers = new Queue<byte>();
             _noteOnEvents = new List<VstMidiEvent>();
             _octavesAddedOrderedNoteOnEvents = new List<VstMidiEvent>();
-            _rythm = new List<NoteLengthSamples>();
+            _rythm = new List<NoteLengthFrames>();
             NoteLengthsArray = new NoteLengths[4];
+            AccentsArray = new Accents[4];
 
             for (int i = 0; i < 4; i++)
             {
                 NoteLengthsArray[i] = NoteLengths.quarter;
+                AccentsArray[i] = Accents.none;
             }
+
             CountRythm();
         }
 
-
-        public int ChannelCount
-        {
-            get { return _plugin.ChannelCount; }
-        }
 
 
         public void Process(VstEventCollection events)
@@ -117,27 +118,9 @@ namespace Arpeggiator
                                 lock (((ICollection)_octavesAddedOrderedNoteOnEvents).SyncRoot)
                                 {
                                     NoteOffNumbers.Enqueue(midiEvent.Data[1]);
-
-                                    /* FOR TESTING ADDOCTAVES()
-                                    string notes = "";
-                                    foreach (VstMidiEvent e in _noteOnEvents)
-                                        notes += e.Data[1] + " ";
-
-                                    MessageBox.Show("Process method: \nNoteOnEvents: " + notes);
-                                    */
-
                                     _noteOnEvents.RemoveAll(n => n.Data[1] == midiEvent.Data[1]);
 
-                                    /* FOR TESTING ADDOCTAVES()
-                                    notes = "";
-                                    foreach (VstMidiEvent e in _noteOnEvents)
-                                        notes += e.Data[1] + " ";
-                                    MessageBox.Show("Process method: \nNoteOnEvents after removing Note Off event: " + notes);
-                                    */
-
-                                    // AddOctaves();
-                                    _octavesAddedOrderedNoteOnEvents = makeCopy(_noteOnEvents);
-
+                                    AddOctaves();
                                     OrderNoteOnEventsWithOctaves();
                                 }
                             }
@@ -154,28 +137,10 @@ namespace Arpeggiator
                             {
                                 lock (((ICollection)_octavesAddedOrderedNoteOnEvents).SyncRoot)
                                 {
-                                    NoteOnNumbers.Enqueue(midiEvent.Data[1]);
-
-                                    /* FOR TESTING ADDOCTAVES()
-                                    string notes = "";
-                                    foreach (VstMidiEvent e in _noteOnEvents)
-                                        notes += e.Data[1] + " ";
-
-                                    MessageBox.Show("Process method: \nNoteOnEvents: " + notes);
-                                    */
-
+                                    NoteOnNumbers.Enqueue(midiEvent.Data[1]);     
                                     _noteOnEvents.Add(midiEvent);
 
-                                    /* FOR TESTING ADDOCTAVES()
-                                    notes = "";
-                                    foreach (VstMidiEvent e in _noteOnEvents)
-                                        notes += e.Data[1] + " ";
-                                    MessageBox.Show("Process method: \nNoteOnEvents after adding Note On event: " + notes);
-                                    */
-
-                                    // AddOctaves();
-                                    _octavesAddedOrderedNoteOnEvents = makeCopy(_noteOnEvents);
-
+                                    AddOctaves();
                                     OrderNoteOnEventsWithOctaves();
 
                                 }
@@ -201,23 +166,11 @@ namespace Arpeggiator
                                     notes += e.Data[1] + " ";
 
                                 MessageBox.Show("Process method: \nNoteOnEvents: " + notes);
-
                                 */
-
-                                // mivel a kisebb oktávú hang (2x...) vhogy belekerült a listába az eredeti helyett, eltávolítani se tudja
 
                                 _noteOnEvents.RemoveAll(n => n.Data[1] == midiEvent.Data[1]);
 
-                                /* FOR TESTING ADDOCTAVES()
-                                notes = "";
-                                foreach (VstMidiEvent e in _noteOnEvents)
-                                    notes += e.Data[1] + " ";
-                                MessageBox.Show("Process method: \nNoteOnEvents after removing Note Off event: " + notes);
-                                */
-
-                                // AddOctaves();
-                                _octavesAddedOrderedNoteOnEvents = makeCopy(_noteOnEvents);
-
+                                AddOctaves();
                                 OrderNoteOnEventsWithOctaves();
                             }
                         }
@@ -228,16 +181,14 @@ namespace Arpeggiator
         }
 
 
-
-
-        #region rythm
+        #region Rythm & Accent
 
         public void setTimeInfo(VstTimeInfo timeInfo)
         {
             _timeInfo = timeInfo;
         }
 
-        List<NoteLengthSamples> _rythm;
+        List<NoteLengthFrames> _rythm;
         private double quarterSampleNo;
 
         // a Tempotól függően kiszámolja, hogy egy negyed hang hány sample
@@ -250,47 +201,82 @@ namespace Arpeggiator
         // based on the length of a quarter, counts the sample numbers of the rythm
         public void CountRythm()
         {
-            _rythm = new List<NoteLengthSamples>();
+            _rythm = new List<NoteLengthFrames>();
 
-            foreach (NoteLengths n in NoteLengthsArray)
+            for (int i = 0; i < 4; i++)
             {
-                switch (Convert.ToInt32(n))
+                switch (Convert.ToInt32(NoteLengthsArray[i]))
                 {
                     case 1: // quarter
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo));
+                        if (AccentsArray[i] == Accents.downbeat)
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo, true));
+                        else
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo, false));
                         break;
+
                     case 2: // eighth-eighth
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 2));
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 2));
+                        if (AccentsArray[i] == Accents.downbeat)
+                        {
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                        }
+                        if (AccentsArray[i] == Accents.upbeat)
+                        {
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                        }
+                        if (AccentsArray[i] == Accents.none)
+                        {
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                        }
                         break;
+
                     case 3: // rest
-                        _rythm.Add(new NoteLengthSamples(false, quarterSampleNo));
+                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo, false));
                         break;
+
                     case 4: // eighth-rest
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 2));
-                        _rythm.Add(new NoteLengthSamples(false, quarterSampleNo / 2));
+                        if (AccentsArray[i] == Accents.downbeat)
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                        else
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo / 2, false));
                         break;
+
                     case 5: // rest-eighth
-                        _rythm.Add(new NoteLengthSamples(false, quarterSampleNo / 2));
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 2));
+                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo / 2, false));
+                        if (AccentsArray[i] == Accents.upbeat)
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                        else
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
                         break;
+
                     case 6: // triplet
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 3));
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 3));
-                        _rythm.Add(new NoteLengthSamples(true, quarterSampleNo / 3));
+                        if (AccentsArray[i] == Accents.downbeat)
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, true));
+                        else
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
+
+                        _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
+
+                        if (AccentsArray[i] == Accents.upbeat)
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, true));
+                        else
+                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
                         break;
                 }
             }
 
-            MessageBox.Show(rythmToString());
+            // MessageBox.Show(rythmToString());
         }
 
         private string rythmToString()
         {
             string result = "";
-            foreach (NoteLengthSamples s in _rythm)
+            foreach (NoteLengthFrames s in _rythm)
             {
-                result += s.note.ToString() + " " + s.frames.ToString() + "\n";
+                result += s.note.ToString() + " " + s.frames.ToString() + " " + s.accent.ToString() + "\n";
             }
             return result;
         }
@@ -298,26 +284,22 @@ namespace Arpeggiator
 
         private const int _deltaFrames = 44100;
         private const int _blockSize = 512;
-        private int _processedFrames = 0;   // ez a _rythm lista egy tagján belül értendő
+        private int _processedFrames = 0;   // ez a _rythm lista egy tagján belül értendő. minden taggal újraindul
         private VstMidiEvent _actualMidiEvent;
         private int _counter = 0;   // a _octavesAddedOrderedNoteOnEvents listen belül hol tart az arp 
         private int _remainder = 0; // FrameDelay 
-
         private int _rythmCounter = 0;  // hol tartunk a _rythm listben
 
         // 44100 sample frame = 1 sec
         // az_octavesAddedOrderedNoteOnEventset dolgozza fel
         public void Arpeggiate()
         {
-            countQuarter(); // minden körben változhat a Tempo...
+            countQuarter(); // if new Tempo was set
 
             VstMidiEvent newMidiEvent;
 
-
-            // egy kör = _rythm lista elejétől a végéig - egyelőre
-            // vagy: _octavesAddedOrdered lófasz lista számít egy körnek?
-
-            // processedFrames: minden _rythm lista taggal újraindul
+            if (_octavesAddedOrderedNoteOnEvents.Count == 0)
+                _rythmCounter = 0;
 
             if (_processedFrames == 0 && _octavesAddedOrderedNoteOnEvents.Count > 0) // kör eleje, van lejátszandó hang
             {
@@ -325,8 +307,16 @@ namespace Arpeggiator
 
                 if (_rythm[_rythmCounter].note) // ha nem szünet
                 {
-                    // note on - 1. hang a listából            
-                    newMidiEvent = new VstMidiEvent(_remainder, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, _actualMidiEvent.Data, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
+                    byte[] midiData = new byte[4];
+                    midiData[0] = 0x90;
+                    midiData[1] = _actualMidiEvent.Data[1];
+                    if (_rythm[_rythmCounter].accent)
+                        midiData[2] = 0x7F;
+                    else
+                        midiData[2] = _actualMidiEvent.Data[2];
+                    midiData[3] = 0;
+
+                    newMidiEvent = new VstMidiEvent(_remainder, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, midiData, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
                     Events.Add(newMidiEvent);
                     _processedFrames += 512;
                 }
@@ -359,12 +349,10 @@ namespace Arpeggiator
 
                 if ((_counter + 1) < _octavesAddedOrderedNoteOnEvents.Count)    // note on a következő hangra az _octavesAddedOrderedNoteOnEvents listából
                 {
-                    if (_rythm[_rythmCounter].note) // ha nem szünet volt, akkor lépthethetem az events listát
-                    {
-                        _counter++;
-                    }
-
                     // rythm
+                    if (_rythm[_rythmCounter].note) // ha nem szünet volt, akkor lépthethetem az events listát
+                        _counter++;
+                                   
                     if ((_rythmCounter + 1) < _rythm.Count)
                         _rythmCounter++;
                     else
@@ -376,10 +364,18 @@ namespace Arpeggiator
                     _actualMidiEvent = makeCopy(_octavesAddedOrderedNoteOnEvents[_counter]);
 
                     // következő hang 
-                    if (_rythm[_rythmCounter].note) // ha nem szünet, jöhet a következő hang note on-ja
-                    {                 
-                        // a note off-fal egy időben jöhet a köv. hang note on-ja is
-                        newMidiEvent = new VstMidiEvent(Convert.ToInt32(_rythm[_rythmCounter].frames) - _processedFrames, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, _actualMidiEvent.Data, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
+                    if (_rythm[_rythmCounter].note) // ha nem szünet, jöhet a következő hang note on-ja is, a note off-fal egyidőben
+                    {
+                        byte[] midiData = new byte[4];
+                        midiData[0] = 0x90;
+                        midiData[1] = _actualMidiEvent.Data[1];
+                        if (_rythm[_rythmCounter].accent)
+                            midiData[2] = 0x7F;
+                        else
+                            midiData[2] = _actualMidiEvent.Data[2];
+                        midiData[3] = 0;
+
+                        newMidiEvent = new VstMidiEvent(Convert.ToInt32(_rythm[_rythmCounter].frames) - _processedFrames, _actualMidiEvent.NoteLength, _actualMidiEvent.NoteOffset, midiData, _actualMidiEvent.Detune, _actualMidiEvent.NoteOffVelocity);
                         Events.Add(newMidiEvent);
 
                         _remainder = 512 - (Convert.ToInt32(_rythm[_rythmCounter].frames) - _processedFrames);
@@ -390,14 +386,13 @@ namespace Arpeggiator
                         _remainder = 512 - (Convert.ToInt32(_rythm[_rythmCounter].frames) - _processedFrames);
                         _processedFrames = 0;
                     }
-            
+
 
                 }
                 else // végigért az _octavesAddedOrderedNoteOnEvents listán, kör eleje
                 {
                     _counter = 0;
                     _actualMidiEvent = null;
-
                     _remainder = 0;
                     _processedFrames = 0;
 
@@ -418,7 +413,7 @@ namespace Arpeggiator
         #endregion
 
 
-
+        #region Order and Octaves
 
         private void OrderNoteOnEventsWithOctaves()
         {
@@ -438,7 +433,7 @@ namespace Arpeggiator
                     _octavesAddedOrderedNoteOnEvents = distinctList.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
                     break;
 
-                case Directions.cyclic_up_down:
+                case Directions.updown:
                     _octavesAddedOrderedNoteOnEvents = distinctList.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
                     List<VstMidiEvent> descendingList = distinctList.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
                     if (descendingList.Count != 0)
@@ -449,7 +444,7 @@ namespace Arpeggiator
                     break;
 
 
-                case Directions.cyclic_down_up:
+                case Directions.downup:
                     _octavesAddedOrderedNoteOnEvents = distinctList.OrderByDescending(midiEvent => midiEvent.Data[1]).ToList();
                     List<VstMidiEvent> ascendingList = distinctList.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
                     if (ascendingList.Count != 0)
@@ -458,12 +453,6 @@ namespace Arpeggiator
                         ascendingList.RemoveAt(ascendingList.Count - 1);  // last item
                     _octavesAddedOrderedNoteOnEvents.AddRange(ascendingList);
                     break;
-
-                /* TODO
-            case Directions.terraced:
-                orderedList = NoteOnEvents.OrderBy(midiEvent => midiEvent.Data[1]).ToList();
-                break;
-                */
 
                 case Directions.random:
                     Random rand = new Random();
@@ -485,50 +474,37 @@ namespace Arpeggiator
         }
 
         public void AddOctaves()
-        {
-
+        {    
             // az eredeti listából induljunk ki
             _octavesAddedOrderedNoteOnEvents = makeCopy(_noteOnEvents);
             List<VstMidiEvent> noteOnEventsCopy = makeCopy(_noteOnEvents);
 
             switch (Octave)
             {
-                case -2:
-
-                    break;
-
                 case -1:
-                    /*
-                    lock (((ICollection)_noteOnEvents).SyncRoot)
-                    {
-                        lock (((ICollection)_octavesAddedOrderedNoteOnEvents).SyncRoot)
-                        {
-                        */
-                    string notes = "";
-                    string extraNotes = "";
+
+                    //string notes = "";
+                    //string extraNotes = "";
 
                     foreach (VstMidiEvent e in noteOnEventsCopy)
                     {
-                        notes += e.Data[1] + " ";
+                        //notes += e.Data[1] + " ";
 
-                        byte[] midiData = e.Data;
+                        byte[] midiData = new byte[4];
+                        midiData[0] = e.Data[0];
+                        midiData[1] = e.Data[1];
+                        midiData[2] = e.Data[2];
+                        midiData[3] = 0;
+
                         if (midiData[1] >= 0xC)         // 0x21 = 33
                         {
                             midiData[1] -= 0xC;         // -12
-                            extraNotes += midiData[1] + " ";
-
-                            VstMidiEvent newMidiEvent = new VstMidiEvent(e.DeltaFrames, e.NoteLength, e.NoteOffset, midiData, e.Detune, e.NoteOffVelocity);
-
-                            // ez miért adja hozzá az új hangot a _noteOnEventshez is?! mert ugyanarra az objectre mutatnak... deep copy kell...
+                            //extraNotes += midiData[1] + " ";
+                            VstMidiEvent newMidiEvent = new VstMidiEvent(e.DeltaFrames, e.NoteLength, e.NoteOffset, midiData, e.Detune, e.NoteOffVelocity);               
                             _octavesAddedOrderedNoteOnEvents.Add(newMidiEvent);
-
                         }
                     }
-
-                    MessageBox.Show("notes: " + notes + "\nadded notes: " + extraNotes);
-
-
-
+                    //MessageBox.Show("notes: " + notes + "\nadded notes: " + extraNotes);
                     break;
 
                 case 0:
@@ -536,23 +512,34 @@ namespace Arpeggiator
                     break;
 
                 case 1:
+                    foreach (VstMidiEvent e in noteOnEventsCopy)
+                    {
+                        byte[] midiData = new byte[4];
+                        midiData[0] = e.Data[0];
+                        midiData[1] = e.Data[1];
+                        midiData[2] = e.Data[2];
+                        midiData[3] = 0;
 
-                    break;
-
-                case 2:
-
-                    break;
-
-                default:
-                    // do nothing
+                        if (midiData[1] <= 0x73)         // 0x21 = 33
+                        {
+                            midiData[1] += 0xC;         // -12
+                            VstMidiEvent newMidiEvent = new VstMidiEvent(e.DeltaFrames, e.NoteLength, e.NoteOffset, midiData, e.Detune, e.NoteOffVelocity);
+                            _octavesAddedOrderedNoteOnEvents.Add(newMidiEvent);
+                        }
+                    }
                     break;
 
             }
         }
 
+        #endregion
 
 
 
+        public int ChannelCount
+        {
+            get { return _plugin.ChannelCount; }
+        }
 
         // * HELPER FUNCTIONS *
 

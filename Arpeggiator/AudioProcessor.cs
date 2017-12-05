@@ -53,7 +53,6 @@ namespace Arpeggiator
 
                 _midiProcessor.setTimeInfo(timeInfo);
                 _midiProcessor.Arpeggiate();
-                // _midiProcessor.TestMakeCopy();
 
                 if (_midiProcessor.Events.Count > 0)
                 {

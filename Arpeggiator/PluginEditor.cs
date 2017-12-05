@@ -5,6 +5,7 @@
     using Jacobi.Vst.Framework;
     using Jacobi.Vst.Framework.Common;
     using System.Windows;
+
     // Implements the custom UI editor for the plugin.
     class PluginEditor : IVstPluginEditor
     {
@@ -18,6 +19,7 @@
             _uiWrapper.SafeInstance.DirectionSelected += DirectionSelected;     
             _uiWrapper.SafeInstance.OctaveSelected += OctaveSelected;
             _uiWrapper.SafeInstance.RythmSelected += RythmSelected;
+            _uiWrapper.SafeInstance.AccentSelected += AccentSelected;
         }
 
         #region IVstPluginEditor Members
@@ -70,7 +72,13 @@
 
         private void RythmSelected(object sender, RythmEventArgs r)
         {
-            _plugin.GetInstance<MidiProcessor>().NoteLengthsArray = r.NoteLengths;
+            _plugin.GetInstance<MidiProcessor>().NoteLengthsArray = r.NoteLengthsArray;
+            _plugin.GetInstance<MidiProcessor>().CountRythm();
+        }
+
+        private void AccentSelected(object sender, AccentEventArgs a)
+        {
+            _plugin.GetInstance<MidiProcessor>().AccentsArray = a.AccentsArray;
             _plugin.GetInstance<MidiProcessor>().CountRythm();
         }
 

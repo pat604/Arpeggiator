@@ -165,6 +165,7 @@ namespace Arpeggiator
             this.comboBoxRythm1.Name = "comboBoxRythm1";
             this.comboBoxRythm1.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm1.TabIndex = 8;
+            this.comboBoxRythm1.SelectedIndex = 0;
             this.comboBoxRythm1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox1_DrawItem_1);
             this.comboBoxRythm1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
             // 
@@ -185,6 +186,7 @@ namespace Arpeggiator
             this.comboBoxRythm2.Name = "comboBoxRythm2";
             this.comboBoxRythm2.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm2.TabIndex = 9;
+            this.comboBoxRythm2.SelectedIndex = 0;
             this.comboBoxRythm2.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox2_DrawItem);
             this.comboBoxRythm2.SelectionChangeCommitted += new System.EventHandler(this.comboBox2_SelectionChangeCommitted);
             // 
@@ -205,6 +207,7 @@ namespace Arpeggiator
             this.comboBoxRythm3.Name = "comboBoxRythm3";
             this.comboBoxRythm3.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm3.TabIndex = 10;
+            this.comboBoxRythm3.SelectedIndex = 0;
             this.comboBoxRythm3.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox3_DrawItem);
             this.comboBoxRythm3.SelectionChangeCommitted += new System.EventHandler(this.comboBox3_SelectionChangeCommitted);
             // 
@@ -225,6 +228,7 @@ namespace Arpeggiator
             this.comboBoxRythm4.Name = "comboBoxRythm4";
             this.comboBoxRythm4.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm4.TabIndex = 11;
+            this.comboBoxRythm4.SelectedIndex = 0;
             this.comboBoxRythm4.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox4_DrawItem);
             this.comboBoxRythm4.SelectionChangeCommitted += new System.EventHandler(this.comboBox4_SelectionChangeCommitted);
             // 
@@ -352,6 +356,7 @@ namespace Arpeggiator
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(55, 21);
             this.comboBox5.TabIndex = 15;
+            this.comboBox5.SelectedIndex = 0;
             this.comboBox5.SelectionChangeCommitted += new System.EventHandler(this.comboBox5_SelectionChangeCommitted);
             // 
             // comboBox6
@@ -365,6 +370,7 @@ namespace Arpeggiator
             this.comboBox6.Name = "comboBox6";
             this.comboBox6.Size = new System.Drawing.Size(55, 21);
             this.comboBox6.TabIndex = 16;
+            this.comboBox6.SelectedIndex = 0;
             this.comboBox6.SelectionChangeCommitted += new System.EventHandler(this.comboBox6_SelectionChangeCommitted);
             // 
             // comboBox7
@@ -378,6 +384,7 @@ namespace Arpeggiator
             this.comboBox7.Name = "comboBox7";
             this.comboBox7.Size = new System.Drawing.Size(55, 21);
             this.comboBox7.TabIndex = 17;
+            this.comboBox7.SelectedIndex = 0;
             this.comboBox7.SelectionChangeCommitted += new System.EventHandler(this.comboBox7_SelectionChangeCommitted);
             // 
             // comboBox8
@@ -391,6 +398,7 @@ namespace Arpeggiator
             this.comboBox8.Name = "comboBox8";
             this.comboBox8.Size = new System.Drawing.Size(55, 21);
             this.comboBox8.TabIndex = 18;
+            this.comboBox8.SelectedIndex = 0;
             this.comboBox8.SelectionChangeCommitted += new System.EventHandler(this.comboBox8_SelectionChangeCommitted);
             // 
             // ArpeggiatorUI

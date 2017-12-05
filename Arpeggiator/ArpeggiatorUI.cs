@@ -34,11 +34,11 @@ namespace Arpeggiator
 
             bs.DataSource = _octaves;
             comboBoxOctaves.DataSource = bs.DataSource;
+            // comboBoxOctaves.Items.Insert(0, 0); // default value
 
             for (int i = 0; i < 4; i++)
             {
-                _noteLengths[i] = NoteLengths.quarter;
-               
+                _noteLengths[i] = NoteLengths.quarter;              
             }
         }
 
@@ -111,7 +111,7 @@ namespace Arpeggiator
         #endregion
 
         #region Octaves 
-        private static int[] _octaves = new int[] { -2, -1, 0, +1, 2 };
+        private static int[] _octaves = new int[] { 0, -1, +1 };
 
         public event EventHandler<OctaveEventArgs> OctaveSelected;
 
@@ -207,7 +207,7 @@ namespace Arpeggiator
         private void sendRythmEvent(object sender, EventArgs e)
         {
             RythmEventArgs r = new RythmEventArgs();
-            r.NoteLengths = _noteLengths;
+            r.NoteLengthsArray = _noteLengths;
 
             if (RythmSelected != null)
             {
@@ -218,30 +218,66 @@ namespace Arpeggiator
 
         #endregion
 
+        #region Accent
+
+        Accents[] _accents = new Accents[4];
+
         private void comboBox5_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            Accents result;
+            Enum.TryParse<Accents>(comboBox5.SelectedItem.ToString(), out result);
+            _accents[0] = result;
+
+           // MessageBox.Show(_accents[0].ToString());
+
+            sendAccentEvent(sender, e);
 
         }
 
         private void comboBox6_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            Accents result;
+            Enum.TryParse<Accents>(comboBox6.SelectedItem.ToString(), out result);
+            _accents[1] = result;
+
+            sendAccentEvent(sender, e);
 
         }
 
         private void comboBox7_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            Accents result;
+            Enum.TryParse<Accents>(comboBox7.SelectedItem.ToString(), out result);
+            _accents[2] = result;
+
+            sendAccentEvent(sender, e);
 
         }
 
         private void comboBox8_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            Accents result;
+            Enum.TryParse<Accents>(comboBox8.SelectedItem.ToString(), out result);
+            _accents[3] = result;
 
+            sendAccentEvent(sender, e);
         }
 
-        #region Accent
 
+        public event EventHandler<AccentEventArgs> AccentSelected;
 
+        private void sendAccentEvent(object sender, EventArgs e)
+        {
+            AccentEventArgs a = new AccentEventArgs();
+            a.AccentsArray = _accents;
 
+            if (AccentSelected != null)
+            {
+                AccentSelected(this, a);
+            }
+        }
+
+       
         #endregion
 
 
@@ -263,7 +299,12 @@ namespace Arpeggiator
 
     public class RythmEventArgs : EventArgs
     {
-        public NoteLengths[] NoteLengths { get; set; }
+        public NoteLengths[] NoteLengthsArray { get; set; }
+    }
+
+    public class AccentEventArgs : EventArgs
+    {
+        public Accents[] AccentsArray { get; set; }
     }
 
 
