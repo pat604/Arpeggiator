@@ -17,7 +17,18 @@ namespace Arpeggiator
     {
         public ArpeggiatorUI()
         {
-            InitializeComponent();      
+            InitializeComponent();
+
+            this.comboBoxRythm1.SelectedIndex = 0;
+            this.comboBoxRythm2.SelectedIndex = 0;
+            this.comboBoxRythm3.SelectedIndex = 0;
+            this.comboBoxRythm4.SelectedIndex = 0;
+            this.comboBox5.SelectedIndex = 0;
+            this.comboBox6.SelectedIndex = 0;
+            this.comboBox7.SelectedIndex = 0;
+            this.comboBox8.SelectedIndex = 0;
+            this.comboBoxProbability.SelectedIndex = 0;
+
             Init();
         }
 
@@ -34,7 +45,6 @@ namespace Arpeggiator
 
             bs.DataSource = _octaves;
             comboBoxOctaves.DataSource = bs.DataSource;
-            // comboBoxOctaves.Items.Insert(0, 0); // default value
 
             for (int i = 0; i < 4; i++)
             {
@@ -62,7 +72,7 @@ namespace Arpeggiator
                     noteNo = NoteOnNumbers.Dequeue();
                     _notesOn.Add(noteNo);
                 }
-                DisplayNotes();
+                displayNotes();
             }
 
 
@@ -75,18 +85,68 @@ namespace Arpeggiator
                     noteNo = NoteOffNumbers.Dequeue();
                     _notesOn.RemoveAll(n => n.Equals(noteNo));
                 }
-                DisplayNotes();
+                displayNotes();
             }
         }
 
 
-        private void DisplayNotes()
+        private void displayNotes()
         {
             labelNotesOn.Text = "";
             foreach (byte note in _notesOn)
             {
-                labelNotesOn.Text += note.ToString() + " ";
+                labelNotesOn.Text += convertNote(note) + "  ";
             }
+        }
+
+        private string convertNote(byte note)
+        {
+            string result = "";
+          
+            switch ((int) (note % 12))
+            {
+                case 0:
+                    result += "C";
+                    break;
+                case 1:
+                    result += "C#";
+                    break;
+                case 2:
+                    result += "D";
+                    break;
+                case 3:
+                    result += "D#";
+                    break;
+                case 4:
+                    result += "E";
+                    break;
+                case 5:
+                    result += "F";
+                    break;
+                case 6:
+                    result += "F#";
+                    break;
+                case 7:
+                    result += "G";
+                    break;
+                case 8:
+                    result += "G#";
+                    break;
+                case 9:
+                    result += "A";
+                    break;
+                case 10:
+                    result += "A#";
+                    break;
+                case 11:
+                    result += "B";
+                    break;
+            }
+
+            int octave = (int)note / 12;
+            result += octave;
+
+            return result;
         }
 
         #endregion
@@ -120,7 +180,6 @@ namespace Arpeggiator
             int selectedOctave = (int)comboBoxOctaves.SelectedValue;
             OctaveEventArgs o = new OctaveEventArgs();
             o.Octave = selectedOctave;
-            e = o;
 
             if (OctaveSelected != null)
             {
@@ -277,10 +336,47 @@ namespace Arpeggiator
             }
         }
 
-       
+
+
         #endregion
 
 
+        #region Swing
+
+        public event EventHandler<SwingEventArgs> SwingSelected;
+
+
+        private void checkBoxSwing_CheckedChanged(object sender, EventArgs e)
+        {
+            bool selectedSwing = checkBoxSwing.Checked;
+            SwingEventArgs s = new SwingEventArgs();
+            s.Swing = selectedSwing;
+
+            if (SwingSelected != null)
+            {
+                SwingSelected(this, s);
+            }
+        }
+
+        #endregion
+
+        #region Note Probability
+
+        public event EventHandler<ProbabilityEventArgs> ProbabilitySelected;
+
+        private void comboBoxProbability_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            int selectedProbability = Convert.ToInt32(comboBoxProbability.SelectedItem);
+            ProbabilityEventArgs p = new ProbabilityEventArgs();
+            p.Probability = selectedProbability;
+
+            if (ProbabilitySelected != null)
+            {
+                ProbabilitySelected(this, p);
+            }
+        }
+
+        #endregion
     }
 
 
@@ -305,6 +401,16 @@ namespace Arpeggiator
     public class AccentEventArgs : EventArgs
     {
         public Accents[] AccentsArray { get; set; }
+    }
+
+    public class SwingEventArgs : EventArgs
+    {
+        public bool Swing { get; set; }
+    }
+
+    public class ProbabilityEventArgs : EventArgs
+    {
+        public int Probability { get; set; }
     }
 
 

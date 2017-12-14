@@ -20,6 +20,8 @@
             _uiWrapper.SafeInstance.OctaveSelected += OctaveSelected;
             _uiWrapper.SafeInstance.RythmSelected += RythmSelected;
             _uiWrapper.SafeInstance.AccentSelected += AccentSelected;
+            _uiWrapper.SafeInstance.SwingSelected += SwingSelected;
+            _uiWrapper.SafeInstance.ProbabilitySelected += ProbabilitySelected;
         }
 
         #region IVstPluginEditor Members
@@ -51,8 +53,6 @@
         
         public void Open(IntPtr hWnd)
         {
-           //  _uiWrapper.SafeInstance.SetPlugin(_plugin); // ???
-
             _uiWrapper.SafeInstance.NoteOnNumbers = _plugin.GetInstance<MidiProcessor>().NoteOnNumbers;
             _uiWrapper.SafeInstance.NoteOffNumbers = _plugin.GetInstance<MidiProcessor>().NoteOffNumbers;
           
@@ -62,12 +62,15 @@
         private void DirectionSelected(object sender, DirectionEventArgs e)
         {
             _plugin.GetInstance<MidiProcessor>().Direction = e.Direction;
+            _plugin.GetInstance<MidiProcessor>().OrderNoteOnEventsWithOctaves();
         }
 
         private void OctaveSelected(object sender, OctaveEventArgs o)
         {
             _plugin.GetInstance<MidiProcessor>().Octave = o.Octave;
-            // _plugin.GetInstance<MidiProcessor>().AddOctaves();     
+            _plugin.GetInstance<MidiProcessor>().AddOctaves();
+            _plugin.GetInstance<MidiProcessor>().OrderNoteOnEventsWithOctaves();
+
         }
 
         private void RythmSelected(object sender, RythmEventArgs r)
@@ -81,6 +84,18 @@
             _plugin.GetInstance<MidiProcessor>().AccentsArray = a.AccentsArray;
             _plugin.GetInstance<MidiProcessor>().CountRythm();
         }
+
+        private void SwingSelected(object sender, SwingEventArgs s)
+        {
+            _plugin.GetInstance<MidiProcessor>().Swing = s.Swing;
+            _plugin.GetInstance<MidiProcessor>().CountRythm();
+        }
+
+        private void ProbabilitySelected(object sender, ProbabilityEventArgs p)
+        {
+          _plugin.GetInstance<MidiProcessor>().Probability = p.Probability;
+        }
+
 
         public void ProcessIdle()
         {

@@ -52,6 +52,10 @@ namespace Arpeggiator
             this.comboBox6 = new System.Windows.Forms.ComboBox();
             this.comboBox7 = new System.Windows.Forms.ComboBox();
             this.comboBox8 = new System.Windows.Forms.ComboBox();
+            this.checkBoxSwing = new System.Windows.Forms.CheckBox();
+            this.comboBoxProbability = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -62,7 +66,7 @@ namespace Arpeggiator
             this.labelNotesOn.BackColor = System.Drawing.Color.Transparent;
             this.labelNotesOn.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelNotesOn.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.labelNotesOn.Location = new System.Drawing.Point(340, 240);
+            this.labelNotesOn.Location = new System.Drawing.Point(117, 217);
             this.labelNotesOn.Name = "labelNotesOn";
             this.labelNotesOn.Size = new System.Drawing.Size(34, 14);
             this.labelNotesOn.TabIndex = 0;
@@ -74,7 +78,7 @@ namespace Arpeggiator
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label1.Location = new System.Drawing.Point(281, 240);
+            this.label1.Location = new System.Drawing.Point(48, 217);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 14);
             this.label1.TabIndex = 1;
@@ -86,7 +90,7 @@ namespace Arpeggiator
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label2.Location = new System.Drawing.Point(38, 70);
+            this.label2.Location = new System.Drawing.Point(48, 70);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(57, 14);
             this.label2.TabIndex = 3;
@@ -109,7 +113,7 @@ namespace Arpeggiator
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label3.Location = new System.Drawing.Point(38, 103);
+            this.label3.Location = new System.Drawing.Point(48, 102);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(48, 14);
             this.label3.TabIndex = 4;
@@ -121,7 +125,7 @@ namespace Arpeggiator
             this.comboBoxOctaves.FormattingEnabled = true;
             this.comboBoxOctaves.Location = new System.Drawing.Point(120, 95);
             this.comboBoxOctaves.Name = "comboBoxOctaves";
-            this.comboBoxOctaves.Size = new System.Drawing.Size(64, 21);
+            this.comboBoxOctaves.Size = new System.Drawing.Size(55, 21);
             this.comboBoxOctaves.TabIndex = 5;
             this.comboBoxOctaves.SelectionChangeCommitted += new System.EventHandler(this.comboBoxOctaves_SelectionChangeCommitted);
             // 
@@ -131,7 +135,7 @@ namespace Arpeggiator
             this.label4.BackColor = System.Drawing.Color.Transparent;
             this.label4.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label4.Location = new System.Drawing.Point(38, 142);
+            this.label4.Location = new System.Drawing.Point(48, 145);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(41, 14);
             this.label4.TabIndex = 7;
@@ -165,7 +169,6 @@ namespace Arpeggiator
             this.comboBoxRythm1.Name = "comboBoxRythm1";
             this.comboBoxRythm1.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm1.TabIndex = 8;
-            this.comboBoxRythm1.SelectedIndex = 0;
             this.comboBoxRythm1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox1_DrawItem_1);
             this.comboBoxRythm1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
             // 
@@ -186,7 +189,6 @@ namespace Arpeggiator
             this.comboBoxRythm2.Name = "comboBoxRythm2";
             this.comboBoxRythm2.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm2.TabIndex = 9;
-            this.comboBoxRythm2.SelectedIndex = 0;
             this.comboBoxRythm2.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox2_DrawItem);
             this.comboBoxRythm2.SelectionChangeCommitted += new System.EventHandler(this.comboBox2_SelectionChangeCommitted);
             // 
@@ -207,7 +209,6 @@ namespace Arpeggiator
             this.comboBoxRythm3.Name = "comboBoxRythm3";
             this.comboBoxRythm3.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm3.TabIndex = 10;
-            this.comboBoxRythm3.SelectedIndex = 0;
             this.comboBoxRythm3.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox3_DrawItem);
             this.comboBoxRythm3.SelectionChangeCommitted += new System.EventHandler(this.comboBox3_SelectionChangeCommitted);
             // 
@@ -228,7 +229,6 @@ namespace Arpeggiator
             this.comboBoxRythm4.Name = "comboBoxRythm4";
             this.comboBoxRythm4.Size = new System.Drawing.Size(55, 31);
             this.comboBoxRythm4.TabIndex = 11;
-            this.comboBoxRythm4.SelectedIndex = 0;
             this.comboBoxRythm4.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox4_DrawItem);
             this.comboBoxRythm4.SelectionChangeCommitted += new System.EventHandler(this.comboBox4_SelectionChangeCommitted);
             // 
@@ -236,7 +236,7 @@ namespace Arpeggiator
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox1.Image = global::Arpeggiator.Properties.Resources.coollogo_com_28574929;
-            this.pictureBox1.Location = new System.Drawing.Point(209, 0);
+            this.pictureBox1.Location = new System.Drawing.Point(25, -3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(233, 60);
             this.pictureBox1.TabIndex = 12;
@@ -246,7 +246,7 @@ namespace Arpeggiator
             // 
             this.pictureBox2.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox2.Image = global::Arpeggiator.Properties.Resources.coollogo_com_66841752;
-            this.pictureBox2.Location = new System.Drawing.Point(293, 59);
+            this.pictureBox2.Location = new System.Drawing.Point(253, 28);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(149, 29);
             this.pictureBox2.TabIndex = 13;
@@ -254,83 +254,31 @@ namespace Arpeggiator
             // 
             // comboBox1
             // 
-            this.comboBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.ItemHeight = 25;
-            this.comboBox1.Items.AddRange(new object[] {
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""});
-            this.comboBox1.Location = new System.Drawing.Point(120, 128);
+            this.comboBox1.Location = new System.Drawing.Point(0, 0);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(55, 31);
-            this.comboBox1.TabIndex = 8;
-            this.comboBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox1_DrawItem_1);
-            this.comboBox1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 0;
             // 
             // comboBox2
             // 
-            this.comboBox2.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.ItemHeight = 25;
-            this.comboBox2.Items.AddRange(new object[] {
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""});
-            this.comboBox2.Location = new System.Drawing.Point(181, 128);
+            this.comboBox2.Location = new System.Drawing.Point(0, 0);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(55, 31);
-            this.comboBox2.TabIndex = 9;
-            this.comboBox2.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox2_DrawItem);
-            this.comboBox2.SelectionChangeCommitted += new System.EventHandler(this.comboBox2_SelectionChangeCommitted);
+            this.comboBox2.Size = new System.Drawing.Size(121, 21);
+            this.comboBox2.TabIndex = 0;
             // 
             // comboBox3
             // 
-            this.comboBox3.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.ItemHeight = 25;
-            this.comboBox3.Items.AddRange(new object[] {
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""});
-            this.comboBox3.Location = new System.Drawing.Point(242, 128);
+            this.comboBox3.Location = new System.Drawing.Point(0, 0);
             this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(55, 31);
-            this.comboBox3.TabIndex = 10;
-            this.comboBox3.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox3_DrawItem);
-            this.comboBox3.SelectionChangeCommitted += new System.EventHandler(this.comboBox3_SelectionChangeCommitted);
+            this.comboBox3.Size = new System.Drawing.Size(121, 21);
+            this.comboBox3.TabIndex = 0;
             // 
             // comboBox4
             // 
-            this.comboBox4.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.ItemHeight = 25;
-            this.comboBox4.Items.AddRange(new object[] {
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""});
-            this.comboBox4.Location = new System.Drawing.Point(303, 128);
+            this.comboBox4.Location = new System.Drawing.Point(0, 0);
             this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(55, 31);
-            this.comboBox4.TabIndex = 11;
-            this.comboBox4.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox4_DrawItem);
-            this.comboBox4.SelectionChangeCommitted += new System.EventHandler(this.comboBox4_SelectionChangeCommitted);
+            this.comboBox4.Size = new System.Drawing.Size(121, 21);
+            this.comboBox4.TabIndex = 0;
             // 
             // label5
             // 
@@ -338,7 +286,7 @@ namespace Arpeggiator
             this.label5.BackColor = System.Drawing.Color.Transparent;
             this.label5.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label5.Location = new System.Drawing.Point(38, 182);
+            this.label5.Location = new System.Drawing.Point(48, 182);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(42, 14);
             this.label5.TabIndex = 14;
@@ -356,11 +304,11 @@ namespace Arpeggiator
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(55, 21);
             this.comboBox5.TabIndex = 15;
-            this.comboBox5.SelectedIndex = 0;
             this.comboBox5.SelectionChangeCommitted += new System.EventHandler(this.comboBox5_SelectionChangeCommitted);
             // 
             // comboBox6
             // 
+            this.comboBox6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox6.FormattingEnabled = true;
             this.comboBox6.Items.AddRange(new object[] {
             "none",
@@ -370,11 +318,11 @@ namespace Arpeggiator
             this.comboBox6.Name = "comboBox6";
             this.comboBox6.Size = new System.Drawing.Size(55, 21);
             this.comboBox6.TabIndex = 16;
-            this.comboBox6.SelectedIndex = 0;
             this.comboBox6.SelectionChangeCommitted += new System.EventHandler(this.comboBox6_SelectionChangeCommitted);
             // 
             // comboBox7
             // 
+            this.comboBox7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox7.FormattingEnabled = true;
             this.comboBox7.Items.AddRange(new object[] {
             "none",
@@ -384,11 +332,11 @@ namespace Arpeggiator
             this.comboBox7.Name = "comboBox7";
             this.comboBox7.Size = new System.Drawing.Size(55, 21);
             this.comboBox7.TabIndex = 17;
-            this.comboBox7.SelectedIndex = 0;
             this.comboBox7.SelectionChangeCommitted += new System.EventHandler(this.comboBox7_SelectionChangeCommitted);
             // 
             // comboBox8
             // 
+            this.comboBox8.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox8.FormattingEnabled = true;
             this.comboBox8.Items.AddRange(new object[] {
             "none",
@@ -398,22 +346,82 @@ namespace Arpeggiator
             this.comboBox8.Name = "comboBox8";
             this.comboBox8.Size = new System.Drawing.Size(55, 21);
             this.comboBox8.TabIndex = 18;
-            this.comboBox8.SelectedIndex = 0;
             this.comboBox8.SelectionChangeCommitted += new System.EventHandler(this.comboBox8_SelectionChangeCommitted);
+            // 
+            // checkBoxSwing
+            // 
+            this.checkBoxSwing.AutoSize = true;
+            this.checkBoxSwing.BackColor = System.Drawing.Color.Transparent;
+            this.checkBoxSwing.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxSwing.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxSwing.ForeColor = System.Drawing.Color.White;
+            this.checkBoxSwing.Location = new System.Drawing.Point(300, 66);
+            this.checkBoxSwing.Name = "checkBoxSwing";
+            this.checkBoxSwing.Size = new System.Drawing.Size(58, 18);
+            this.checkBoxSwing.TabIndex = 19;
+            this.checkBoxSwing.Text = "Swing";
+            this.checkBoxSwing.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.checkBoxSwing.UseVisualStyleBackColor = false;
+            this.checkBoxSwing.CheckedChanged += new System.EventHandler(this.checkBoxSwing_CheckedChanged);
+            // 
+            // comboBoxProbability
+            // 
+            this.comboBoxProbability.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxProbability.FormattingEnabled = true;
+            this.comboBoxProbability.Items.AddRange(new object[] {
+            "100",
+            "90",
+            "80",
+            "70",
+            "60",
+            "50"});
+            this.comboBoxProbability.Location = new System.Drawing.Point(310, 96);
+            this.comboBoxProbability.Name = "comboBoxProbability";
+            this.comboBoxProbability.Size = new System.Drawing.Size(48, 21);
+            this.comboBoxProbability.TabIndex = 20;
+            this.comboBoxProbability.SelectionChangeCommitted += new System.EventHandler(this.comboBoxProbability_SelectionChangeCommitted);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.Transparent;
+            this.label6.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.label6.Location = new System.Drawing.Point(204, 99);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(93, 14);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Note probability";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.BackColor = System.Drawing.Color.Transparent;
+            this.label7.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.label7.Location = new System.Drawing.Point(364, 99);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(17, 14);
+            this.label7.TabIndex = 22;
+            this.label7.Text = "%";
             // 
             // ArpeggiatorUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::Arpeggiator.Properties.Resources.background;
-            this.ClientSize = new System.Drawing.Size(454, 262);
+            this.ClientSize = new System.Drawing.Size(417, 245);
+            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.comboBoxProbability);
+            this.Controls.Add(this.checkBoxSwing);
             this.Controls.Add(this.comboBox8);
             this.Controls.Add(this.comboBox7);
             this.Controls.Add(this.comboBox6);
             this.Controls.Add(this.comboBox5);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.comboBoxRythm4);
             this.Controls.Add(this.comboBoxRythm3);
             this.Controls.Add(this.comboBoxRythm2);
@@ -462,5 +470,9 @@ namespace Arpeggiator
         private ComboBox comboBox6;
         private ComboBox comboBox7;
         private ComboBox comboBox8;
+        private CheckBox checkBoxSwing;
+        private ComboBox comboBoxProbability;
+        private Label label6;
+        private Label label7;
     }
 }

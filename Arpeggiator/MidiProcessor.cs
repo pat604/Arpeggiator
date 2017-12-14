@@ -71,6 +71,10 @@ namespace Arpeggiator
 
         public Accents[] AccentsArray { get; set; }
 
+        public bool Swing { get; set; }
+
+        public int Probability { get; set; }
+
 
         public MidiProcessor(Plugin plugin)
         {
@@ -81,6 +85,7 @@ namespace Arpeggiator
             _noteOnEvents = new List<VstMidiEvent>();
             _octavesAddedOrderedNoteOnEvents = new List<VstMidiEvent>();
             _rythm = new List<NoteLengthFrames>();
+            Probability = 100;
             NoteLengthsArray = new NoteLengths[4];
             AccentsArray = new Accents[4];
 
@@ -137,7 +142,7 @@ namespace Arpeggiator
                             {
                                 lock (((ICollection)_octavesAddedOrderedNoteOnEvents).SyncRoot)
                                 {
-                                    NoteOnNumbers.Enqueue(midiEvent.Data[1]);     
+                                    NoteOnNumbers.Enqueue(midiEvent.Data[1]);
                                     _noteOnEvents.Add(midiEvent);
 
                                     AddOctaves();
@@ -189,87 +194,181 @@ namespace Arpeggiator
         }
 
         List<NoteLengthFrames> _rythm;
-        private double quarterSampleNo;
+        private double quarterFramesNo;
 
         // a Tempotól függően kiszámolja, hogy egy negyed hang hány sample
         private void countQuarter()
         {
             double beatsPerSec = _timeInfo.Tempo / 60;
-            quarterSampleNo = 44100 / beatsPerSec;
+            quarterFramesNo = 44100 / beatsPerSec;
         }
 
         // based on the length of a quarter, counts the sample numbers of the rythm
-        public void CountRythm()
+        public void CountRythm()    // without swing
+        {
+            if (Swing)
+                CountRythmWithSwing();
+            else
+            {
+                _rythm = new List<NoteLengthFrames>();
+
+                for (int i = 0; i < 4; i++)
+                {
+                    switch (Convert.ToInt32(NoteLengthsArray[i]))
+                    {
+                        case 1: // quarter
+                            if (AccentsArray[i] == Accents.downbeat)
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo, true));
+                            else
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo, false));
+                            break;
+
+                        case 2: // eighth-eighth
+                            if (AccentsArray[i] == Accents.downbeat)
+                            {
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, true));
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                            }
+                            if (AccentsArray[i] == Accents.upbeat)
+                            {
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, true));
+                            }
+                            if (AccentsArray[i] == Accents.none)
+                            {
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                            }
+                            break;
+
+                        case 3: // rest
+                            _rythm.Add(new NoteLengthFrames(false, quarterFramesNo, false));
+                            break;
+
+                        case 4: // eighth-rest
+                            if (AccentsArray[i] == Accents.downbeat)
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, true));
+                            else
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(false, quarterFramesNo / 2, false));
+                            break;
+
+                        case 5: // rest-eighth
+                            _rythm.Add(new NoteLengthFrames(false, quarterFramesNo / 2, false));
+                            if (AccentsArray[i] == Accents.upbeat)
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, true));
+                            else
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                            break;
+
+                        case 6: // triplet
+                            if (AccentsArray[i] == Accents.downbeat)
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 3, true));
+                            else
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 3, false));
+
+                            _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 3, false));
+
+                            if (AccentsArray[i] == Accents.upbeat)
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 3, true));
+                            else
+                                _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 3, false));
+                            break;
+                    }
+                }
+
+                // MessageBox.Show(rythmToString());
+            }
+        }
+
+        private void CountRythmWithSwing()
         {
             _rythm = new List<NoteLengthFrames>();
+
+            double firstNoteFrames;
+            double secondNoteFrames;
+            double thirdNoteFrames;
 
             for (int i = 0; i < 4; i++)
             {
                 switch (Convert.ToInt32(NoteLengthsArray[i]))
                 {
-                    case 1: // quarter
+                    case 1: // quarter - no swing
                         if (AccentsArray[i] == Accents.downbeat)
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo, true));
+                            _rythm.Add(new NoteLengthFrames(true, quarterFramesNo, true));
                         else
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo, false));
+                            _rythm.Add(new NoteLengthFrames(true, quarterFramesNo, false));
                         break;
 
-                    case 2: // eighth-eighth
+                    case 2: // eighth-eighth - swing
+
+                        firstNoteFrames = (quarterFramesNo / 24) * 17;   // utolsó 1/3 és 1/4 közé eső érték
+                        secondNoteFrames = quarterFramesNo - firstNoteFrames;
+
                         if (AccentsArray[i] == Accents.downbeat)
                         {
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, firstNoteFrames, true));
+                            _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, false));
                         }
                         if (AccentsArray[i] == Accents.upbeat)
                         {
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                            _rythm.Add(new NoteLengthFrames(true, firstNoteFrames, false));
+                            _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, true));
                         }
                         if (AccentsArray[i] == Accents.none)
                         {
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, firstNoteFrames, false));
+                            _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, false));
                         }
                         break;
 
-                    case 3: // rest
-                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo, false));
+                    case 3: // rest - no swing
+                        _rythm.Add(new NoteLengthFrames(false, quarterFramesNo, false));
                         break;
 
-                    case 4: // eighth-rest
+                    case 4: // eighth-rest - no swing
                         if (AccentsArray[i] == Accents.downbeat)
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                            _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, true));
                         else
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
-                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, quarterFramesNo / 2, false));
+                        _rythm.Add(new NoteLengthFrames(false, quarterFramesNo / 2, false));
                         break;
 
-                    case 5: // rest-eighth
-                        _rythm.Add(new NoteLengthFrames(false, quarterSampleNo / 2, false));
+                    case 5: // rest-eighth - swing
+
+                        firstNoteFrames = (quarterFramesNo / 24) * 17;   // utolsó 1/3 és 1/4 közé eső érték
+                        secondNoteFrames = quarterFramesNo - firstNoteFrames;
+
+                        _rythm.Add(new NoteLengthFrames(false, firstNoteFrames, false));
                         if (AccentsArray[i] == Accents.upbeat)
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, true));
+                            _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, true));
                         else
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 2, false));
+                            _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, false));
                         break;
 
-                    case 6: // triplet
+                    case 6: // triplet - swing
+
+                        firstNoteFrames = quarterFramesNo / 3;              // 8/24
+                        secondNoteFrames = (quarterFramesNo / 24) * 10;      // 10/24
+                        thirdNoteFrames = (quarterFramesNo / 24) * 6;       // 6/24
+
+
                         if (AccentsArray[i] == Accents.downbeat)
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, true));
+                            _rythm.Add(new NoteLengthFrames(true, firstNoteFrames, true));
                         else
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
+                            _rythm.Add(new NoteLengthFrames(true, firstNoteFrames, false));
 
-                        _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
+                        _rythm.Add(new NoteLengthFrames(true, secondNoteFrames, false));
 
                         if (AccentsArray[i] == Accents.upbeat)
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, true));
+                            _rythm.Add(new NoteLengthFrames(true, thirdNoteFrames, true));
                         else
-                            _rythm.Add(new NoteLengthFrames(true, quarterSampleNo / 3, false));
+                            _rythm.Add(new NoteLengthFrames(true, thirdNoteFrames, false));
                         break;
                 }
             }
-
-            // MessageBox.Show(rythmToString());
         }
+
 
         private string rythmToString()
         {
@@ -289,6 +388,8 @@ namespace Arpeggiator
         private int _counter = 0;   // a _octavesAddedOrderedNoteOnEvents listen belül hol tart az arp 
         private int _remainder = 0; // FrameDelay 
         private int _rythmCounter = 0;  // hol tartunk a _rythm listben
+        private Random random = new Random();
+        int randomValue;
 
         // 44100 sample frame = 1 sec
         // az_octavesAddedOrderedNoteOnEventset dolgozza fel
@@ -299,14 +400,19 @@ namespace Arpeggiator
             VstMidiEvent newMidiEvent;
 
             if (_octavesAddedOrderedNoteOnEvents.Count == 0)
+            {
                 _rythmCounter = 0;
+            }
 
             if (_processedFrames == 0 && _octavesAddedOrderedNoteOnEvents.Count > 0) // kör eleje, van lejátszandó hang
             {
                 _actualMidiEvent = makeCopy(_octavesAddedOrderedNoteOnEvents[_counter]);
+      
+                // probability
+                randomValue = random.Next(1, 101);    // 1-100
 
-                if (_rythm[_rythmCounter].note) // ha nem szünet
-                {
+                if (_rythm[_rythmCounter].note && randomValue <= Probability) // ha nem szünet
+                {           
                     byte[] midiData = new byte[4];
                     midiData[0] = 0x90;
                     midiData[1] = _actualMidiEvent.Data[1];
@@ -323,19 +429,20 @@ namespace Arpeggiator
                 else // ha szünet
                 {
                     _processedFrames += 512;
+
                 }
             }
 
             // ha a még legalább egy kör van hátra addig, amíg a hangot ki kell játszani
-            else if (_processedFrames < _rythm[_rythmCounter].frames - 512 && _actualMidiEvent != null) // 43588 + 512 = 44100
+            else if (_processedFrames < _rythm[_rythmCounter].frames - 512 && _actualMidiEvent != null) // kör léptetése
             {
                 _processedFrames += 512;
             }
 
             else if (_actualMidiEvent != null) // note off. a processedFrames belépett a kritikus szakaszba
             {
-
-                if (_rythm[_rythmCounter].note) // ha nem szünet, akkor note off az előző hangra
+                // && randomValue <= Probability
+                if (_rythm[_rythmCounter].note ) // ha nem szünet, akkor note off az előző hangra
                 {
                     // create note off event
                     byte[] midiData = new byte[4];
@@ -347,10 +454,10 @@ namespace Arpeggiator
                     Events.Add(newMidiEvent);
                 }
 
-                if ((_counter + 1) < _octavesAddedOrderedNoteOnEvents.Count)    // note on a következő hangra az _octavesAddedOrderedNoteOnEvents listából
+                if (_counter + 1 < _octavesAddedOrderedNoteOnEvents.Count)    // note on a következő hangra az _octavesAddedOrderedNoteOnEvents listából
                 {
                     // rythm
-                    if (_rythm[_rythmCounter].note) // ha nem szünet volt, akkor lépthethetem az events listát
+                    if (_rythm[_rythmCounter].note) // ha nem szünet volt, akkor lépthethetem az events listát. a probability itt nem érdekes
                         _counter++;
                                    
                     if ((_rythmCounter + 1) < _rythm.Count)
@@ -362,10 +469,12 @@ namespace Arpeggiator
                     }
 
                     _actualMidiEvent = makeCopy(_octavesAddedOrderedNoteOnEvents[_counter]);
+                    randomValue = random.Next(1, 101);
 
                     // következő hang 
-                    if (_rythm[_rythmCounter].note) // ha nem szünet, jöhet a következő hang note on-ja is, a note off-fal egyidőben
+                    if (_rythm[_rythmCounter].note && randomValue <= Probability) // ha nem szünet, jöhet a következő hang note on-ja is, a note off-fal egyidőben
                     {
+                        // note on
                         byte[] midiData = new byte[4];
                         midiData[0] = 0x90;
                         midiData[1] = _actualMidiEvent.Data[1];
@@ -413,9 +522,9 @@ namespace Arpeggiator
         #endregion
 
 
-        #region Order and Octaves
+        #region  NoteListGenerator: Order and Octaves
 
-        private void OrderNoteOnEventsWithOctaves()
+        public void OrderNoteOnEventsWithOctaves()
         {
             // mindegyik Note On eventből csak egy legyen (az AddOctaves() miatt kell)
             List<VstMidiEvent> distinctList = makeCopy(_octavesAddedOrderedNoteOnEvents);

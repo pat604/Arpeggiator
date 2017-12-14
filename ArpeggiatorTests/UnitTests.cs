@@ -13,7 +13,16 @@ namespace ArpeggiatorTests
     public class UnitTests
     {
 
-     
+        /*
+        SendMidiData(new byte[4] { 144, 72, 127, 0}, vstKey);
+        SendMidiData(new byte[4] { 144, 76, 127, 0}, vstKey);
+        SendMidiData(new byte[4] { 144, 79, 127, 0}, vstKey);
+        SendMidiData(new byte[4] { 144, 81, 127, 0}, vstKey);
+        Thread.Sleep(2000);
+        */
+
+
+
         /*
         PluginCommandStub pluginCommandStub;
         ArpeggiatorUI ui;

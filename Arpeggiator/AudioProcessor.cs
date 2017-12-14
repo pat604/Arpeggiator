@@ -29,8 +29,6 @@ namespace Arpeggiator
         {
             _plugin = plugin;
             _midiProcessor = plugin.GetInstance<MidiProcessor>();
-
-            // _midiProcessor.setBlockSize(_plugin.Host.GetInstance<IVstHostSequencer>().BlockSize);
         }
 
         // MidiProcessor's Process is called before this
